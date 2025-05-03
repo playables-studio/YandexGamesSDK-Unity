@@ -7,7 +7,8 @@ namespace YandexGames.Types.IAP
     public class PurchasedProductsResponse
     {
         [field: Preserve]
-        public ProductListResponse[] purchasedProducts;
+        public YGPurchasedProduct[] purchasedProducts;
+
         [field: Preserve]
         public string signature;
     }

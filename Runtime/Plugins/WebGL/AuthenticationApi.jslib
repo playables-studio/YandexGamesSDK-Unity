@@ -19,47 +19,69 @@ const authenticationApiLibrary = {
 
     authenticateUser: function(requireSignin, successCallbackPtr, errorCallbackPtr) {
       try {
-        authenticationApi.throwIfSdkNotInitialized();
-        
-        const authPromise = requireSignin 
-          ? authenticationApi.sdk.auth.openAuthDialog()
-          : Promise.resolve();
-          
-        authPromise.then(function() {
-          return authenticationApi.sdk.getPlayer({ scopes: false });
-        }).then(function(player) {
-          authenticationApi.playerAccount = player;
-          authenticationApi.isAuthorized = player.getMode() !== 'lite';
-          
-          const userProfile = {
-            id: player.getUniqueID() || "",
-            name: player.getName() || "Guest",
-            isAuthorized: authenticationApi.isAuthorized,
-            avatarUrlSmall: player.getPhoto("small") || "",
-            avatarUrlMedium: player.getPhoto("medium") || "",
-            avatarUrlLarge: player.getPhoto("large") || ""
-          };
-          
-          yandexGamesPlugin.sendResponse(
-            successCallbackPtr,
-            errorCallbackPtr,
-            JSON.stringify(userProfile),
-            null
-          );
-        }).catch(function(error) {
-          yandexGamesPlugin.sendResponse(
+        if (!authenticationApi.sdk) {
+          throw new Error("Yandex Games SDK not initialized");
+        }
+
+        authenticationApi.sdk.getPlayer({
+          scopes: false,
+          signed: true
+        })
+          .then(function(player) {
+            var isAuthorized = player.getMode() !== 'lite';
+
+            if (requireSignin && !isAuthorized) {
+              return authenticationApi.sdk.auth.openAuthDialog()
+                  .then(function() {
+                    return authenticationApi.sdk.getPlayer({
+                      scopes: false,
+                      signed: true
+                    });
+                  })
+                  .catch(function(error) {
+                    if (error.message.includes("auth window opener")) {
+                      return player;
+                    }
+                    throw error;
+                  });
+            }
+            return player;
+          })
+          .then(function(player) {
+            var isAuthorized = player.getMode() !== 'lite';
+            var result = {
+              id: player.getUniqueID(),
+              name: player.getName() || "Guest",
+              isAuthorized: isAuthorized,
+              avatarUrlSmall: player.getPhoto("small") || "",
+              avatarUrlMedium: player.getPhoto("medium") || "",
+              avatarUrlLarge: player.getPhoto("large") || "",
+              signature: player.signature || ""
+            };
+
+            yandexGamesPlugin.sendResponse(
+                successCallbackPtr,
+                errorCallbackPtr,
+                result,
+                null
+            );
+          })
+          .catch(function(error) {
+            console.error("Authentication error:", error);
+            yandexGamesPlugin.sendResponse(
+                successCallbackPtr,
+                errorCallbackPtr,
+                null,
+                error.message || "Authentication failed"
+            );
+          });
+
+      } catch (error) {
+        yandexGamesPlugin.sendResponse(
             successCallbackPtr,
             errorCallbackPtr,
             null,
-            error instanceof Error ? error.message : "Failed to authenticate user"
-          );
-        });
-      } catch (error) {
-        yandexGamesPlugin.sendResponse(
-          successCallbackPtr,
-          errorCallbackPtr,
-          null,
-          error instanceof Error ? error.message : "Unknown error during authentication"
+            error.message || "Initialization error"
         );
       }
     },
@@ -93,6 +115,7 @@ const authenticationApiLibrary = {
             if (player.getMode() !== 'lite') {
               authenticationApi.isAuthorized = true;
               authenticationApi.playerAccount = player;
+
               yandexGamesPlugin.sendResponse(
                 successCallbackPtr,
                 errorCallbackPtr,

@@ -11,7 +11,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public class AuthenticationModule : YGModuleBase, IAuthenticationModule
     {
-        public UserProfile CurrentUser { get; protected set; }
+        public UserProfile CurrentUser { get; private set; }
         public bool IsAuthorized => GetPlayerAccountIsAuthorized();
 
         public bool HasPersonalProfileDataPermission => GetPlayerAccountHasPersonalProfileDataPermission();
@@ -41,10 +41,18 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         {
             try
             {
-                s_instance.CurrentUser = JsonConvert.DeserializeObject<UserProfile>(jsonResponse);
-                YGLogger.Debug(
-                    $"Authentication successful. User: {s_instance.CurrentUser.name}, ID: {s_instance.CurrentUser.id}");
-                s_authCallback?.Invoke(true, null);
+                YGLogger.Debug($"HandleAuthenticationResponse. jsonResponse: {jsonResponse}");
+                var response = JsonConvert.DeserializeObject<JSResponse<UserProfile>>(jsonResponse);
+                if (response.status && response.data != null)
+                {
+                    s_instance.CurrentUser = response.data;
+                    YGLogger.Debug($"Authentication successful. User: {s_instance.CurrentUser.name}, ID: {s_instance.CurrentUser.id}");
+                    s_authCallback?.Invoke(true, null);
+                }
+                else
+                {
+                    s_authCallback?.Invoke(false, response.error);
+                }
             }
             catch (Exception ex)
             {
@@ -58,10 +66,19 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         {
             try
             {
-                var updatedProfile = JsonConvert.DeserializeObject<UserProfile>(jsonResponse);
-                s_instance.CurrentUser = updatedProfile;
-                YGLogger.Debug($"Profile permission granted for user: {s_instance.CurrentUser.name}");
-                s_profilePermissionCallback?.Invoke(true, s_instance.CurrentUser, null);
+                YGLogger.Debug($"HandleProfilePermissionResponse. jsonResponse: {jsonResponse}");
+
+                var response = JsonConvert.DeserializeObject<JSResponse<UserProfile>>(jsonResponse);
+                if (response.status && response.data != null)
+                {
+                    s_instance.CurrentUser = response.data;
+                    YGLogger.Debug($"Profile permission granted for user: {s_instance.CurrentUser.name}");
+                    s_profilePermissionCallback?.Invoke(true, s_instance.CurrentUser, null);
+                }
+                else
+                {
+                    s_profilePermissionCallback?.Invoke(false, null, response.error);
+                }
             }
             catch (Exception ex)
             {

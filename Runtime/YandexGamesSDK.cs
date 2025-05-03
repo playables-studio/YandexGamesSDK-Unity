@@ -71,6 +71,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
                     if (_instance == null)
                     {
                         GameObject sdkObject = new GameObject(nameof(YandexGamesSDK));
+                        DontDestroyOnLoad(sdkObject);
                         _instance = sdkObject.AddComponent<YandexGamesSDK>();
                     }
                 }

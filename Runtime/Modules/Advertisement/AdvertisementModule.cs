@@ -23,7 +23,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
 
     public class AdvertisementModule : YGModuleBase, IAdvertisementModule
     {
-        private YGPauseSettings _pauseSettings = YandexGamesSDKConfig.Instance.pauseSettings;
+        private YGPauseSettings _pauseSettings => YandexGamesSDKConfig.Instance.pauseSettings;
 
         public UnityEvent OnAdOpened = new UnityEvent();
         public UnityEvent OnAdClosed = new UnityEvent();

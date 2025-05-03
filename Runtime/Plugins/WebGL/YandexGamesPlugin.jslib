@@ -23,9 +23,13 @@ const yandexGamesPluginLibrary = {
 
       const jsonPtr = yandexGamesPlugin.allocateUnmanagedString(JSON.stringify(response));
       if (error) {
-        dynCall('vi', errorCallbackPtr, [jsonPtr]);
+        {{{ makeDynCall('vi', 'errorCallbackPtr') }}} (jsonPtr);
+        // see https://docs.unity3d.com/6000.0/Documentation/Manual/web-interacting-browser-deprecated.html#dyncall
+        // dynCall('vi', errorCallbackPtr, [jsonPtr]);
       } else {
-        dynCall('vi', successCallbackPtr, [jsonPtr]);
+        {{{ makeDynCall('vi', 'successCallbackPtr') }}} (jsonPtr);
+        // see https://docs.unity3d.com/6000.0/Documentation/Manual/web-interacting-browser-deprecated.html#dyncall
+        // dynCall('vi', successCallbackPtr, [jsonPtr]);
       }
       _free(jsonPtr);
     },
@@ -37,7 +41,7 @@ const yandexGamesPluginLibrary = {
       yandexGamesPlugin.isInitializeCalled = true;
 
       const sdkScript = document.createElement('script');
-      sdkScript.src = 'https://yandex.ru/games/sdk/v2';
+      sdkScript.src = yandexGamesPlugin.isProduction() ? '/sdk.js' : 'https://yandex.ru/games/sdk/v2';
       document.head.appendChild(sdkScript);
 
       sdkScript.onload = function() {
@@ -274,12 +278,17 @@ const yandexGamesPluginLibrary = {
     
     isRunningOnYandex: function() {
       const hostname = window.location.hostname;
-      return hostname.includes('yandex') || 
-             hostname.includes('localhost') || 
-             hostname.includes('127.0.0.1') || 
-             hostname.includes('playhop');
+      return hostname.includes('yandex')
+          || hostname.includes('playhop')
+          || window.document.URL.includes('yandex');
     },
-    
+
+    isProduction: function() {
+      const hostname = window.location.hostname;
+      return !hostname.includes('localhost')
+          && !hostname.includes('127.0.0.1');
+    },
+
     isInitializedGetter: function() {
       return yandexGamesPlugin.isInitialized ? 1 : 0;
     }
@@ -289,11 +298,11 @@ const yandexGamesPluginLibrary = {
   YandexGamesPlugin_Initialize: function(successCallbackPtr, errorCallbackPtr) {
     yandexGamesPlugin.initialize(successCallbackPtr, errorCallbackPtr);
   },
-  
+
   YandexGamesPlugin_GetEnvironment: function(successCallbackPtr, errorCallbackPtr) {
-    yandexGamesPlugin.getEnvironment(null, successCallbackPtr, errorCallbackPtr);
+    yandexGamesPlugin.getEnvironment(successCallbackPtr, errorCallbackPtr);
   },
-  
+
   YandexGamesPlugin_GetServerTime: function(successCallbackPtr, errorCallbackPtr) {
     yandexGamesPlugin.getServerTime(successCallbackPtr, errorCallbackPtr);
   },

@@ -2,7 +2,10 @@
     "name": "YandexGames.Runtime",
     "rootNamespace": "YandexGames",
     "references": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor",
+        "WebGL"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

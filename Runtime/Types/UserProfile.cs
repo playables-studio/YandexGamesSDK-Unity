@@ -1,6 +1,4 @@
 using System;
-using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Utilities;
-using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
 {
@@ -13,5 +11,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
         public string avatarUrlMedium;
         public string avatarUrlLarge;
         public bool isAuthorized;
+        public string signature;
     }
 }

@@ -44,7 +44,10 @@ const purchaseApiLibrary = {
           yandexGamesPlugin.sendResponse(
             successCallbackPtr,
             errorCallbackPtr,
-            purchaseResponse,
+            {
+              purchasedProduct: purchaseResponse,
+              signature: purchaseResponse.signature
+            },
             null
           );
         }).catch(function(error) {
@@ -147,7 +150,10 @@ const purchaseApiLibrary = {
           yandexGamesPlugin.sendResponse(
             successCallbackPtr,
             errorCallbackPtr,
-            { purchasedProducts: purchases },
+            {
+              purchasedProducts: purchases,
+              signature: purchases.signature
+            },
             null
           );
         }).catch(function(error) {

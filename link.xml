@@ -1,10 +1,6 @@
 <linker>
-    <assembly fullname="Assembly-CSharp" preserve="all"/> 
-    <!-- 
-    <assembly fullname="Assembly-CSharp"> 
-        <type fullname="PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage.CloudStorageModule" preserve="all"/>
-        <type fullname="PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage.MockCloudStorageModule" preserve="all"/> 
+    <assembly fullname="YandexGames.Runtime" preserve="all"/>
+    <assembly fullname="Assembly-CSharp">
+        <namespace fullname="PlayablesStudio.Plugins.YandexGamesSDK.Runtime" preserve="all"/>
     </assembly>
-    -->
-    
-</linker> 
+</linker>
