@@ -22,16 +22,20 @@ const yandexGamesPluginLibrary = {
       };
 
       const jsonPtr = yandexGamesPlugin.allocateUnmanagedString(JSON.stringify(response));
-      if (error) {
-        {{{ makeDynCall('vi', 'errorCallbackPtr') }}} (jsonPtr);
-        // see https://docs.unity3d.com/6000.0/Documentation/Manual/web-interacting-browser-deprecated.html#dyncall
-        // dynCall('vi', errorCallbackPtr, [jsonPtr]);
-      } else {
-        {{{ makeDynCall('vi', 'successCallbackPtr') }}} (jsonPtr);
-        // see https://docs.unity3d.com/6000.0/Documentation/Manual/web-interacting-browser-deprecated.html#dyncall
-        // dynCall('vi', successCallbackPtr, [jsonPtr]);
+      try {
+          if (error) {
+            {{{ makeDynCall('vi', 'errorCallbackPtr') }}} (jsonPtr);
+            // see https://docs.unity3d.com/6000.0/Documentation/Manual/web-interacting-browser-deprecated.html#dyncall
+            // dynCall('vi', errorCallbackPtr, [jsonPtr]);
+          } else {
+            {{{ makeDynCall('vi', 'successCallbackPtr') }}} (jsonPtr);
+            // see https://docs.unity3d.com/6000.0/Documentation/Manual/web-interacting-browser-deprecated.html#dyncall
+            // dynCall('vi', successCallbackPtr, [jsonPtr]);
+          }
       }
-      _free(jsonPtr);
+      finally {
+        _free(jsonPtr);
+      }
     },
 
     initialize: function(successCallbackPtr, errorCallbackPtr) {
