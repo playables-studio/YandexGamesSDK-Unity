@@ -35,10 +35,10 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         /// <summary>
         /// Starts polling for authorization status in background
         /// </summary>
-        /// <param name="repeatDelay">Delay between polling attempts in milliseconds</param>
+        /// <param name="repeatDelay">Delay between polling attempts</param>
         /// <param name="successCallback">Called when authorization succeeds</param>
         /// <param name="errorCallback">Called if polling fails</param>
-        void StartAuthorizationPolling(int repeatDelay, Action successCallback = null, Action errorCallback = null);
+        void StartAuthorizationPolling(TimeSpan repeatDelay, Action successCallback = null, Action<string> errorCallback = null);
 
         /// <summary>
         /// Requests permission to access user's personal profile data

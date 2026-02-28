@@ -23,7 +23,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         private static Action<bool, string> s_authCallback;
         private static Action<bool, UserProfile, string> s_profilePermissionCallback;
         private static Action s_pollingSuccessCallback;
-        private static Action s_pollingErrorCallback;
+        private static Action<string> s_pollingErrorCallback;
         private static AuthenticationModule s_instance;
 
         private static bool GetPlayerAccountIsAuthorized()
@@ -95,11 +95,11 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
             s_pollingSuccessCallback?.Invoke();
         }
 
-        [MonoPInvokeCallback(typeof(Action))]
-        private static void HandlePollingErrorCallback()
+        [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void HandlePollingErrorCallback(string error)
         {
-            YGLogger.Error("Authorization polling failed");
-            s_pollingErrorCallback?.Invoke();
+            YGLogger.Error($"Authorization polling failed: {error}");
+            s_pollingErrorCallback?.Invoke(error);
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
@@ -126,7 +126,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 
         [DllImport("__Internal")]
         private static extern void AuthenticationApi_StartAuthorizationPolling(int repeatDelay,
-            Action successCallback, Action errorCallback);
+            Action successCallback, Action<string> errorCallback);
 
         [DllImport("__Internal")]
         private static extern void AuthenticationApi_RequestProfilePermission(
@@ -168,25 +168,25 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
             callback?.Invoke(false, "Authentication is only available in WebGL builds.");
 #endif
         }
-
-        public void StartAuthorizationPolling(int repeatDelay, Action successCallback = null,
-            Action errorCallback = null)
+        
+        public void StartAuthorizationPolling(TimeSpan repeatDelay, Action successCallback = null,
+            Action<string> errorCallback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (!YandexGamesSDK.IsInitialized)
             {
                 YGLogger.Error("SDK is not initialized. Call Initialize first.");
-                errorCallback?.Invoke();
+                errorCallback?.Invoke("sdk is not initialized");
                 return;
             }
 
             s_pollingSuccessCallback = successCallback;
             s_pollingErrorCallback = errorCallback;
-            AuthenticationApi_StartAuthorizationPolling(repeatDelay, HandlePollingSuccessCallback,
+            AuthenticationApi_StartAuthorizationPolling(repeatDelay.Milliseconds, HandlePollingSuccessCallback,
                 HandlePollingErrorCallback);
 #else
             YGLogger.Debug("Authorization polling is only available in WebGL builds.");
-            errorCallback?.Invoke();
+            errorCallback?.Invoke("only available in WebGL builds");
 #endif
         }
 
