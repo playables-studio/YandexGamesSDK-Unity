@@ -87,8 +87,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
             }
         }
 
-        [MonoPInvokeCallback(typeof(Action))]
-        private static void HandlePollingSuccessCallback()
+        [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void HandlePollingSuccessCallback(string jsonResponse)
         {
             YGLogger.Debug("Authorization polling succeeded");
             s_instance.AuthorizedInBackground?.Invoke();
@@ -96,10 +96,11 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
-        private static void HandlePollingErrorCallback(string error)
+        private static void HandlePollingErrorCallback(string errorJson)
         {
-            YGLogger.Error($"Authorization polling failed: {error}");
-            s_pollingErrorCallback?.Invoke(error);
+            var response = JsonConvert.DeserializeObject<JSResponse<string>>(errorJson);
+            YGLogger.Error($"Authorization polling failed: {response.error}");
+            s_pollingErrorCallback?.Invoke(response.error);
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
@@ -126,7 +127,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 
         [DllImport("__Internal")]
         private static extern void AuthenticationApi_StartAuthorizationPolling(int repeatDelay,
-            Action successCallback, Action<string> errorCallback);
+            Action<string> successCallback, Action<string> errorCallback);
 
         [DllImport("__Internal")]
         private static extern void AuthenticationApi_RequestProfilePermission(
