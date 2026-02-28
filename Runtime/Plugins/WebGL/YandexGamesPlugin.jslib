@@ -40,6 +40,9 @@ const yandexGamesPluginLibrary = {
 
     initialize: function(successCallbackPtr, errorCallbackPtr) {
       if (yandexGamesPlugin.isInitializeCalled) {
+        yandexGamesPlugin.sendResponse(successCallbackPtr, errorCallbackPtr, null,
+            "Yandex Games SDK initialization is already called"
+        );
         return;
       }
       yandexGamesPlugin.isInitializeCalled = true;
