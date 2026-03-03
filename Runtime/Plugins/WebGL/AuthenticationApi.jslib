@@ -115,6 +115,7 @@ const authenticationApiLibrary = {
             if (player.isAuthorized()) {
               authenticationApi.isAuthorized = true;
               authenticationApi.playerAccount = player;
+              cloudStorageApi.playerAccount = player;
 
               yandexGamesPlugin.sendResponse(
                 successCallbackPtr,
