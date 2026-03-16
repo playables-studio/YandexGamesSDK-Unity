@@ -8,13 +8,14 @@ using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.LocalStorage;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Purchases;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Feedback;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
 using Newtonsoft.Json;
 using AOT;
-using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Purchases;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 {
@@ -188,6 +189,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         public ILeaderboardModule Leaderboard { get; private set; }
         public IAdvertisementModule Advertisement { get; private set; }
         public IPurchaseModule Purchases { get; private set; }
+        public IFeedbackModule Feedback { get; private set; }
 
         private readonly Dictionary<Type, YGModuleBase> _modules = new Dictionary<Type, YGModuleBase>();
         private Action _onInitializeCallback;
@@ -340,6 +342,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
             CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
             Purchases = LoadAndInitializeModule<PurchaseModule>();
+            Feedback = LoadAndInitializeModule<FeedbackModule>();
 #elif UNITY_EDITOR
             CloudStorage = LoadAndInitializeModule<MockCloudStorageModule>();
 

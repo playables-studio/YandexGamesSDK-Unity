@@ -65,6 +65,13 @@ const yandexGamesPluginLibrary = {
           });
         }
 
+        if (typeof feedbackApi !== 'undefined' && !feedbackApi.isInitialized) {
+          feedbackApi.sdk = sdk;
+          feedbackApi.initializeFeedback().catch(function(error) {
+            console.error("Failed to initialize feedback:", error);
+          });
+        }
+
         if (typeof authenticationApi !== 'undefined' && !authenticationApi.isInitialized) {
           authenticationApi.sdk = sdk;
           authenticationApi.isInitialized = true;
